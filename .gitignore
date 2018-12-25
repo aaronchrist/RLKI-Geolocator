@@ -34,3 +34,16 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+.Rproj.user
+
+# image files
+*.jpg
+*.JPG
+*.JPEG
+*.png
+*.tiff
+*.pdf
+
+# doc files
+*.doc
+*.docx
