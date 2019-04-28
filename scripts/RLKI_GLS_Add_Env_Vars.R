@@ -59,34 +59,98 @@ n_distinct(tracks$loggerID)
 # 024_1494798789193.nc 2010-12-31 2011-06-01
 # 024_1501874976336.nc 2015-16 noz uo vo
 # 024_1501877327442.nc 2016-17 noz uo vo
+# 024_1545798301435.nc 2016-17 noz uo vo
+# 024_1546115422194.nc 2016-17 noz uo vo
+# 024_1546116043746.nc 2016-17 noz uo vo
+# 024_1546116288864.nc 2016-17 noz uo vo
+# 024_1546116465020.nc 2016-17 noz uo vo
 
-# # Bring in the current data uo,vo, and ssh
-# uo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="uo")
-# uo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="uo")
-# uo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="uo")
-# uo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="uo")
-# uo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="uo")
-# uo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="uo")
-#
-# uo<-stack(uo11a,uo11b,uo14,uo15,uo16,uo17)
-#
-# vo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="vo")
-# vo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="vo")
-# vo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="vo")
-# vo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="vo")
-# vo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="vo")
-# vo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="vo")
-# vo<-stack(vo11a,vo11b,vo14,vo15,vo16,vo17)
-#
-# ssh11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="zos")
-# ssh11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="zos")
-# ssh14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="zos")
-# ssh15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="zos")
-# ssh16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="zos")
-# ssh17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="zos")
-# ssh<-stack(ssh11a,ssh11b,ssh14,ssh15,ssh16,ssh17)
-#
-#
+# Bring in the current data uo,vo, and ssh
+uo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="uo")
+uo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="uo")
+uo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="uo")
+uo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="uo")
+uo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="uo")
+uo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="uo")
+extent(uo17)
+shift_crop<-function(x,y){
+  x1 <- crop(x, extent(-180, 0, 34, 67))
+  x1<-shift(x1,x=360)
+  x2 <- crop(x, extent(0, 180, 34, 67))
+  m <- merge(x1, x2)
+  m<-crop(m,y = extent(y))
+  names(m)<-names(x)
+  return(m)
+}
+
+uo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="uo")
+uo17a<-shift_crop(uo17a,uo17)
+uo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="uo")
+uo17b<-shift_crop(uo17b,uo17)
+
+uo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="uo")
+uo17c<-shift_crop(uo17c,uo17)
+
+uo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="uo")
+uo17d<-shift_crop(uo17d,uo17)
+
+uo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="uo")
+names(uo17e)
+uo17e<-shift_crop(uo17e,uo17)
+
+extent(uo17)
+extent(uo17a)
+uo<-stack(uo11a,uo11b,uo14,uo15,uo16,uo17,uo17a,uo17b,uo17c,uo17d,uo17e)
+tail(names(uo))
+vo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="vo")
+vo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="vo")
+vo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="vo")
+vo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="vo")
+vo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="vo")
+vo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="vo")
+
+vo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="vo")
+vo17a<-shift_crop(vo17a,vo17)
+
+vo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="vo")
+vo17b<-shift_crop(vo17b,vo17)
+
+vo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="vo")
+vo17c<-shift_crop(vo17c,vo17)
+
+vo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="vo")
+vo17d<-shift_crop(vo17d,vo17)
+
+vo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="vo")
+vo17e<-shift_crop(vo17e,vo17)
+
+vo<-stack(vo11a,vo11b,vo14,vo15,vo16,vo17,vo17a,vo17b,vo17c,vo17d,vo17e)
+
+ssh11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="zos")
+ssh11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="zos")
+ssh14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="zos")
+ssh15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="zos")
+ssh16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="zos")
+ssh17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="zos")
+
+ssh17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="zos")
+ssh17a<-shift_crop(ssh17a,ssh17)
+
+ssh17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="zos")
+ssh17b<-shift_crop(ssh17b,ssh17)
+
+ssh17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="zos")
+ssh17c<-shift_crop(ssh17c,ssh17)
+
+ssh17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="zos")
+ssh17d<-shift_crop(ssh17d,ssh17)
+
+ssh17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="zos")
+ssh17e<-shift_crop(ssh17e,ssh17)
+
+ssh<-stack(ssh11a,ssh11b,ssh14,ssh15,ssh16,ssh17,ssh17a,ssh17b,ssh17c,ssh17d,ssh17e)
+
+
 # # To resample vars --------------------------------------------------------
 #
 # To aggragate raster cells to downsample resulution in chunks of 100 layers
@@ -106,13 +170,13 @@ agg <- function( stack_s = ssh,  fun = "mean", fact = 3 ){
   return(stack1_down)
 }
 
-# ssh<-agg(stack_s = ssh,fun = "mean",fact = 3)
-# uo<-agg(stack_s = uo,fun = "mean",fact = 3)
-# vo<-agg(stack_s = vo,fun = "mean",fact = 3)
+ssh<-agg(stack_s = ssh,fun = "mean",fact = 3)
+uo<-agg(stack_s = uo,fun = "mean",fact = 3)
+vo<-agg(stack_s = vo,fun = "mean",fact = 3)
 
-# saveRDS(ssh,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
-# saveRDS(uo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/uo_0.25.rds"))
-# saveRDS(vo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/vo_0.25.rds"))
+saveRDS(ssh,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
+saveRDS(uo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/uo_0.25.rds"))
+saveRDS(vo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/vo_0.25.rds"))
 names(tracks)
 # Load the resampled vars (all 0.25 degre resolution)
 ssh<-readRDS(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
@@ -173,8 +237,8 @@ for(i in 1:length(dates)){
 
   spdf <- SpatialPolygonsDataFrame(spol, data.frame(id=1:length(spol)), FALSE)
   spdf <- spTransform(spdf,CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +lon_wrap=180"))
-# plot(spdf,add=T)
-# plot(ssh[[datex]])
+  # plot(spdf,add=T)
+  # plot(ssh[[datex]])
   # ssh
   vx<- velox(ssh[[datex]])
 
@@ -218,7 +282,12 @@ head(tracks)
 # sst2015<-stack(file.path(LandMaskPath,'sst.day.mean.2015.v2.nc'))
 sst2016<-stack(file.path(LandMaskPath,'sst.day.mean.2016.v2.nc'))
 sst2017<-stack(file.path(LandMaskPath,'sst.day.mean.2017.v2.nc'))
-# nc_open(file.path(LandMaskPath,'sst.day.mean.2016.v2.nc'))
+sst2017a<-stack(file.path(LandMaskPath,'sst.day.mean.2017.nc'))
+sst2017
+sst2017a
+nc_open(file.path(LandMaskPath,'sst.day.mean.2017.nc'))
+nc_open(file.path(LandMaskPath,'sst.day.mean.2017.v2.nc'))
+nc_open(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") )
 
 # Combine stacks
 sst<-stack(sst2016,sst2017)
@@ -230,7 +299,7 @@ ggplot(tracks %>%
          ungroup %>%
          filter(!is.na(ssh)) %>%
          ungroup #%>% sample_n(30000)
-       )+geom_point(aes(lon360,lat,col=ssh))
+)+geom_point(aes(lon360,lat,col=ssh))
 # Loop to add sst and sst_g
 tracks$sst<-NA
 tracks$sst_g<-NA
@@ -626,7 +695,7 @@ saveRDS(tracks,OutDataPath)
 # Download NOAA ETOPO1 data
 # Highest resolution or the 0.25 degree res?
 aleu <- marmap::getNOAA.bathy(130, -140, 30, 75, resolution = 1,
-                      antimeridian = T,keep = T) #resolution 1.85km*27=49.9km2
+                              antimeridian = T,keep = T) #resolution 1.85km*27=49.9km2
 # Make it a raster
 bathy<-as.raster(aleu)
 bathy[bathy>=0]<-NA
