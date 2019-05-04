@@ -41,142 +41,156 @@ if(Sys.info()[["user"]]=="abramfleishman") {
 # tracks<-readRDS(paste0(Migration,"/Data/processedLocs/probGLS/RLKI_GLS_alltracks.rda"))
 tracks<-readRDS(DataInPath)
 unique(tracks$loggerID)
-
-# make date col
+#
+# # make date col
 tracks$date<-as.Date(tracks$datetime)
 tracks$week<-week(tracks$datetime)
-n_distinct(tracks$loggerID)
-# tracks<-tracks %>% filter(month%in%c(9,10,11,12,1,2,3,4,5,6))
-# Add ENV vars ------------------------------------------------------------
-# Data from the CMEMS Global Analysis Forecast ----------------------------
-
-# File dates
-
-# 024_1494782985210.nc 2013-14
-# 024_1494711054915.nc 2015-16
-# 024_1494776551825.nc 2014-15
-# 024_1494798426931.nc 2010-06-01 to 2010-12-31
-# 024_1494798789193.nc 2010-12-31 2011-06-01
-# 024_1501874976336.nc 2015-16 noz uo vo
-# 024_1501877327442.nc 2016-17 noz uo vo
-# 024_1545798301435.nc 2016-17 noz uo vo
-# 024_1546115422194.nc 2016-17 noz uo vo
-# 024_1546116043746.nc 2016-17 noz uo vo
-# 024_1546116288864.nc 2016-17 noz uo vo
-# 024_1546116465020.nc 2016-17 noz uo vo
-
-# Bring in the current data uo,vo, and ssh
-uo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="uo")
-uo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="uo")
-uo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="uo")
-uo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="uo")
-uo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="uo")
-uo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="uo")
-extent(uo17)
-shift_crop<-function(x,y){
-  x1 <- crop(x, extent(-180, 0, 34, 67))
-  x1<-shift(x1,x=360)
-  x2 <- crop(x, extent(0, 180, 34, 67))
-  m <- merge(x1, x2)
-  m<-crop(m,y = extent(y))
-  names(m)<-names(x)
-  return(m)
-}
-
-uo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="uo")
-uo17a<-shift_crop(uo17a,uo17)
-uo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="uo")
-uo17b<-shift_crop(uo17b,uo17)
-
-uo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="uo")
-uo17c<-shift_crop(uo17c,uo17)
-
-uo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="uo")
-uo17d<-shift_crop(uo17d,uo17)
-
-uo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="uo")
-names(uo17e)
-uo17e<-shift_crop(uo17e,uo17)
-
-extent(uo17)
-extent(uo17a)
-uo<-stack(uo11a,uo11b,uo14,uo15,uo16,uo17,uo17a,uo17b,uo17c,uo17d,uo17e)
-tail(names(uo))
-vo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="vo")
-vo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="vo")
-vo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="vo")
-vo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="vo")
-vo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="vo")
-vo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="vo")
-
-vo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="vo")
-vo17a<-shift_crop(vo17a,vo17)
-
-vo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="vo")
-vo17b<-shift_crop(vo17b,vo17)
-
-vo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="vo")
-vo17c<-shift_crop(vo17c,vo17)
-
-vo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="vo")
-vo17d<-shift_crop(vo17d,vo17)
-
-vo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="vo")
-vo17e<-shift_crop(vo17e,vo17)
-
-vo<-stack(vo11a,vo11b,vo14,vo15,vo16,vo17,vo17a,vo17b,vo17c,vo17d,vo17e)
-
-ssh11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="zos")
-ssh11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="zos")
-ssh14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="zos")
-ssh15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="zos")
-ssh16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="zos")
-ssh17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="zos")
-
-ssh17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="zos")
-ssh17a<-shift_crop(ssh17a,ssh17)
-
-ssh17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="zos")
-ssh17b<-shift_crop(ssh17b,ssh17)
-
-ssh17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="zos")
-ssh17c<-shift_crop(ssh17c,ssh17)
-
-ssh17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="zos")
-ssh17d<-shift_crop(ssh17d,ssh17)
-
-ssh17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="zos")
-ssh17e<-shift_crop(ssh17e,ssh17)
-
-ssh<-stack(ssh11a,ssh11b,ssh14,ssh15,ssh16,ssh17,ssh17a,ssh17b,ssh17c,ssh17d,ssh17e)
-
-
-# # To resample vars --------------------------------------------------------
+# n_distinct(tracks$loggerID)
+# # tracks<-tracks %>% filter(month%in%c(9,10,11,12,1,2,3,4,5,6))
+# # Add ENV vars ------------------------------------------------------------
+# # Data from the CMEMS Global Analysis Forecast ----------------------------
 #
-# To aggragate raster cells to downsample resulution in chunks of 100 layers
-agg <- function( stack_s = ssh,  fun = "mean", fact = 3 ){
-  if(dim(stack_s)[3]>100) {
-    idx<-seq(1,dim(stack_s)[3],100)
-  } else {
-    idx <- c(1,dim(stack_s)[3])
-  }
-
-  for(i in 1:(length(idx) -1) ){
-    print(paste("index:", i," of ", length(idx) -1 ))
-    stack1 <- stack_s[[ idx[i]:lead( idx )[i] ]]
-    if( i==1) stack1_down <- aggregate( stack1, fact = fact, fun = fun, na.rm = T )
-    if( i>1) stack1_down <- stack(stack1_down,aggregate( stack1, fact = fact, fun = fun, na.rm = T ))
-  }
-  return(stack1_down)
-}
-
-ssh<-agg(stack_s = ssh,fun = "mean",fact = 3)
-uo<-agg(stack_s = uo,fun = "mean",fact = 3)
-vo<-agg(stack_s = vo,fun = "mean",fact = 3)
-
-saveRDS(ssh,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
-saveRDS(uo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/uo_0.25.rds"))
-saveRDS(vo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/vo_0.25.rds"))
+# # File dates
+#
+# # 024_1494782985210.nc 2013-14
+# # 024_1494711054915.nc 2015-16
+# # 024_1494776551825.nc 2014-15
+# # 024_1494798426931.nc 2010-06-01 to 2010-12-31
+# # 024_1494798789193.nc 2010-12-31 2011-06-01
+# # 024_1501874976336.nc 2015-16 noz uo vo
+# # 024_1501877327442.nc 2016-17 noz uo vo
+# # 024_1545798301435.nc 2016-17 noz uo vo
+# # 024_1546115422194.nc 2016-17 noz uo vo
+# # 024_1546116043746.nc 2016-17 noz uo vo
+# # 024_1546116288864.nc 2016-17 noz uo vo
+# # 024_1546116465020.nc 2016-17 noz uo vo
+#
+# # Bring in the current data uo,vo, and ssh
+# uo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="uo")
+# uo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="uo")
+# uo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="uo")
+# uo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="uo")
+# uo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="uo")
+# uo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="uo")
+# extent(uo17)
+# shift_crop<-function(x,y){
+#   x1 <- crop(x, extent(-180, 0, 34, 67))
+#   x1<-shift(x1,x=360)
+#   x2 <- crop(x, extent(0, 180, 34, 67))
+#   m <- merge(x1, x2)
+#   m<-crop(m,y = extent(y))
+#   names(m)<-names(x)
+#   return(m)
+# }
+#
+# uo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="uo")
+# uo17a<-shift_crop(uo17a,uo17)
+# uo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="uo")
+# uo17b<-shift_crop(uo17b,uo17)
+#
+# uo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="uo")
+# uo17c<-shift_crop(uo17c,uo17)
+#
+# uo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="uo")
+# uo17d<-shift_crop(uo17d,uo17)
+#
+# uo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="uo")
+# names(uo17e)
+# uo17e<-shift_crop(uo17e,uo17)
+#
+# uo18<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1556952426071.nc") ,varname="uo")
+# names(uo18)
+# uo18<-shift_crop(uo18,uo17)
+#
+# extent(uo17)
+# extent(uo17a)
+# uo<-stack(uo11a,uo11b,uo14,uo15,uo16,uo17,uo17a,uo17b,uo17c,uo17d,uo17e,uo18)
+# # writeRaster(uo,filename =paste0(BS_ENV,'/global-analysis-forecast-phy-001-024/uo_compiled.nc' ))
+# saveRDS(uo,paste0(BS_ENV,'/global-analysis-forecast-phy-001-024/uo_compiled.rds' ))
+# tail(names(uo))
+# vo11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="vo")
+# vo11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="vo")
+# vo14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="vo")
+# vo15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="vo")
+# vo16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="vo")
+# vo17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="vo")
+#
+# vo17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="vo")
+# vo17a<-shift_crop(vo17a,vo17)
+#
+# vo17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="vo")
+# vo17b<-shift_crop(vo17b,vo17)
+#
+# vo17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="vo")
+# vo17c<-shift_crop(vo17c,vo17)
+#
+# vo17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="vo")
+# vo17d<-shift_crop(vo17d,vo17)
+#
+# vo17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="vo")
+# vo17e<-shift_crop(vo17e,vo17)
+#
+# vo18<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1556952426071.nc") ,varname="vo")
+# vo18<-shift_crop(vo18,vo17)
+#
+# vo<-stack(vo11a,vo11b,vo14,vo15,vo16,vo17,vo17a,vo17b,vo17c,vo17d,vo17e,vo18)
+# saveRDS(vo,paste0(BS_ENV,'/global-analysis-forecast-phy-001-024/vo_compiled.rds' ))
+#
+# ssh11a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798426931.nc") ,varname="zos")
+# ssh11b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494798789193.nc") ,varname="zos")
+# ssh14<- stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494782985210.nc") ,varname="zos")
+# ssh15<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1494776551825.nc") ,varname="zos")
+# ssh16<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501874976336.nc") ,varname="zos")
+# ssh17<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") ,varname="zos")
+#
+# ssh17a<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1545798301435.nc") ,varname="zos")
+# ssh17a<-shift_crop(ssh17a,ssh17)
+#
+# ssh17b<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546115422194.nc") ,varname="zos")
+# ssh17b<-shift_crop(ssh17b,ssh17)
+#
+# ssh17c<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116043746.nc") ,varname="zos")
+# ssh17c<-shift_crop(ssh17c,ssh17)
+#
+# ssh17d<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116288864.nc") ,varname="zos")
+# ssh17d<-shift_crop(ssh17d,ssh17)
+#
+# ssh17e<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1546116465020.nc") ,varname="zos")
+# ssh17e<-shift_crop(ssh17e,ssh17)
+#
+# ssh18<-stack(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1556952426071.nc") ,varname="zos")
+# ssh18<-shift_crop(ssh18,ssh17)
+#
+# ssh<-stack(ssh11a,ssh11b,ssh14,ssh15,ssh16,ssh17,ssh17a,ssh17b,ssh17c,ssh17d,ssh17e,ssh18)
+# saveRDS(ssh,paste0(BS_ENV,'/global-analysis-forecast-phy-001-024/ssh_compiled.rds' ))
+#
+#
+# # # To resample vars --------------------------------------------------------
+# #
+# # To aggragate raster cells to downsample resulution in chunks of 100 layers
+# agg <- function( stack_s = ssh,  fun = "mean", fact = 3 ){
+#   if(dim(stack_s)[3]>100) {
+#     idx<-seq(1,dim(stack_s)[3],100)
+#   } else {
+#     idx <- c(1,dim(stack_s)[3])
+#   }
+#
+#   for(i in 1:(length(idx) -1) ){
+#     print(paste("index:", i," of ", length(idx) -1 ))
+#     stack1 <- stack_s[[ idx[i]:lead( idx )[i] ]]
+#     if( i==1) stack1_down <- aggregate( stack1, fact = fact, fun = fun, na.rm = T )
+#     if( i>1) stack1_down <- stack(stack1_down,aggregate( stack1, fact = fact, fun = fun, na.rm = T ))
+#   }
+#   return(stack1_down)
+# }
+#
+# ssh<-agg(stack_s = ssh,fun = "mean",fact = 3)
+# uo<-agg(stack_s = uo,fun = "mean",fact = 3)
+# vo<-agg(stack_s = vo,fun = "mean",fact = 3)
+#
+# saveRDS(ssh,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
+# saveRDS(uo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/uo_0.25.rds"))
+# saveRDS(vo,paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/vo_0.25.rds"))
 names(tracks)
 # Load the resampled vars (all 0.25 degre resolution)
 ssh<-readRDS(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/ssh_0.25.rds"))
@@ -241,8 +255,8 @@ for(i in 1:length(dates)){
   # plot(ssh[[datex]])
   # ssh
   vx<- velox(ssh[[datex]])
-
   tracks$ssh[which(tracks$date==dates[i])] <- vx$extract(spdf, fun=function(x)mean(x,na.rm=T))
+
   if(sum(is.na(tracks$ssh[which(tracks$date==dates[i])]))>0) stop("boom")
   vx<- velox(terrain(ssh[[datex]],opt = "slope",neighbors = 8))
   tracks$ssh_g[which(tracks$date==dates[i])] <- vx$extract(spdf, fun=function(x)mean(x,na.rm=T))
@@ -282,18 +296,18 @@ head(tracks)
 # sst2015<-stack(file.path(LandMaskPath,'sst.day.mean.2015.v2.nc'))
 sst2016<-stack(file.path(LandMaskPath,'sst.day.mean.2016.v2.nc'))
 sst2017<-stack(file.path(LandMaskPath,'sst.day.mean.2017.v2.nc'))
-sst2017a<-stack(file.path(LandMaskPath,'sst.day.mean.2017.nc'))
-sst2017
-sst2017a
-nc_open(file.path(LandMaskPath,'sst.day.mean.2017.nc'))
-nc_open(file.path(LandMaskPath,'sst.day.mean.2017.v2.nc'))
-nc_open(paste0(BS_ENV,"/global-analysis-forecast-phy-001-024/global-analysis-forecast-phy-001-024_1501877327442.nc") )
+sst2018<-stack(file.path(LandMaskPath,'sst.day.mean.2018.v2.nc'))
+# sst2017
+# sst2017a
+# nc_open(file.path(LandMaskPath,'sst.day.mean.2017.nc'))
+# nc_open(file.path(LandMaskPath,'sst.day.mean.2017.v2.nc'))
+
 
 # Combine stacks
-sst<-stack(sst2016,sst2017)
+sst<-stack(sst2016,sst2017,sst2018)
 tracks %>%
   ungroup %>%
-  filter(!is.na(ssh)) %>% pull(datetime) %>% as.Date %>% unique
+  filter(is.na(ssh)) %>% pull(datetime) %>% as.Date %>% unique %>% sort
 
 ggplot(tracks %>%
          ungroup %>%
@@ -346,21 +360,22 @@ rm(list=ls(pattern = "uo"))
 # http://nsidc.org/data/docs/noaa/g02186_masie/index.html
 
 # For bulk unzipping
-# zips<-list.files(paste0(BS_ENV,"/Sea_Ice_shps"),pattern = "zip",recursive = F,full.names = T)
+zips<-list.files(paste0(BS_ENV,"/Sea_Ice_shps/zip"),pattern = "zip",recursive = T,full.names = T)
 # head(zips)
-# for(i in zips) unzip(zipfile = i,exdir = paste0(BS_ENV,"/Sea_Ice_shps/unzipped"))
+for(i in zips) unzip(zipfile = i,exdir = paste0(BS_ENV,"/Sea_Ice_shps/unzip"))
 
 
-shps<-list.files(paste0(BS_ENV,"/Sea_Ice_shps/unzipped"),pattern="shp$",recursive = T,full.names = T)
+shps<-list.files(paste0(BS_ENV,"/Sea_Ice_shps/unzip"),pattern="shp$",recursive = T,full.names = T)
+
 shpdate<-str_extract(shps,"[0-9]{7}")
 shpyear<-str_extract(shpdate,"[0-9]{4}")
 shpdoy<-str_extract(shpdate,"[0-9]{3}$")
-missingice<-data.frame(year=c(2010,2010,2010,2011,2011,2012,2012,2014,2014,2014,2014,2015,2016),
-                       doy =c( 010, 031, 181, 024, 040, 250, 252, 241, 290, 293, 294, 108, 195))
+missingice<-data.frame(year=c(2010,2010,2010,2011,2011,2012,2012,2014,2014,2014,2014,2015,2016,2017,2017),
+                       doy =c( 010, 031, 181, 024, 040, 250, 252, 241, 290, 293, 294, 108, 195,307,308))
 
 
 # Function to open ice for a year and doy
-openIce<-function(year=2016,yearT=2017,doy=1,path=paste0(BS_ENV,"/Sea_Ice_shps/unzipped")){
+openIce<-function(year=2017,yearT=2017,doy=1,path=paste0(BS_ENV,"/Sea_Ice_shps/unzipped")){
   # There are some missing ice files and to make sure it doesnt break I made this
   # while statement
   while(TRUE%in%(year==missingice$year&doy==missingice$doy)) { doy=doy-1 }
@@ -410,7 +425,7 @@ for(j in 1:length(Dates)){
   tracks1<-subset(tracks_sp,date==Dates[j])
   # this opens all the ice files for the date
   ice<-openIce(year=unique(year(unique(tracks1$date))),yearT=unique(tracks1$yearT),doy = yday(unique(tracks1$date)),
-               path=paste0(BS_ENV,"/Sea_Ice_shps/unzipped"))
+               path=paste0(BS_ENV,"/Sea_Ice_shps/unzip"))
 
   # calculate the distance from every point to every edge
   tempdist<-  gDistance(tracks1,ice,byid = T)
@@ -478,13 +493,31 @@ for(i in unique(tracks$doy)){
 
 saveRDS(tracks,OutDataPath)
 #
-# ggplot()+
-#   geom_polygon(data=map_data(map = 'world2'),aes(long,lat,group=group),fill=8,color="black")+
-#   geom_point(data=tracks %>%  filter(!is.na(Depth)) ,aes(x=lon360,y=lat,col=Depth))+
-#   coord_fixed(xlim = c(140,220), ylim=c(30,70))+
-#   theme(legend.position = "bottom") +
-#   facet_wrap(~yearT)
+ggplot()+
+  geom_polygon(data=map_data(map = 'world2'),aes(long,lat,group=group),fill=8,color="black")+
+  geom_point(data=tracks %>%  filter(!is.na(Depth)) ,aes(x=lon360,y=lat,col=Depth))+
+  coord_fixed(xlim = c(140,220), ylim=c(30,70))+
+  theme(legend.position = "bottom") +
+  facet_wrap(~yearT)
 
+ggplot()+
+  geom_polygon(data=map_data(map = 'world2'),aes(long,lat,group=group),fill=8,color="black")+
+  geom_point(data=tracks %>%  filter(!is.na(sst)) ,aes(x=lon360,y=lat,col=sst))+
+  coord_fixed(xlim = c(140,220), ylim=c(30,70))+
+  theme(legend.position = "bottom") +
+  facet_wrap(~yearT)+scale_colour_viridis_c(option = "B")
+ggplot()+
+  geom_polygon(data=map_data(map = 'world2'),aes(long,lat,group=group),fill=8,color="black")+
+  geom_point(data=tracks %>%  filter(!is.na(dist2ice)) ,aes(x=lon360,y=lat,col=dist2ice))+
+  coord_fixed(xlim = c(140,220), ylim=c(30,70))+
+  theme(legend.position = "bottom") +
+  facet_wrap(~yearT)+scale_colour_viridis_c(option = "B")
+ggplot()+
+  geom_polygon(data=map_data(map = 'world2'),aes(long,lat,group=group),fill=8,color="black")+
+  geom_point(data=tracks %>%  filter(!is.na(ssh)) ,aes(x=lon360,y=lat,col=ssh))+
+  coord_fixed(xlim = c(140,220), ylim=c(30,70))+
+  theme(legend.position = "bottom") +
+  facet_wrap(~yearT)+scale_colour_viridis_c(option = "B")
 # # Modis CHL monthly means data --------------------------------------------
 # # monthly 30 day
 # #  # code to resample to 0.25 degrees
