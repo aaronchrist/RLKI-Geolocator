@@ -28,19 +28,19 @@ bufferM<-185000
 # Set main dir: Sys.info()[6] is the username for the computer.
 # fill in the "" with your user name
 if(Sys.info()[["user"]]=="abramfleishman") {
-  Migration<-"~/Dropbox (Personal)/RLKI/RLKI_Migrations"
+  Migration<-"~/Dropbox (CMI)/RLKI_Migrations"
   BS_ENV<-"~/Dropbox (CMI)/RLKI_Large_Data/Bering_Environmental_Data"
   LandMaskPath<-"~/Dropbox (CMI)/RLKI_Large_Data/Bering_Environmental_Data/LandMask"
   OutDataPath<-paste0("~/Dropbox (CMI)/RLKI_Large_Data/tracks_buldir_vars_",bufferM/1000,"km_25.rds")
   DataInPath<-paste0(Migration, "/Data/processedLocs/probGLS/RLKI_GLS_Buldir_allyearsalldata.rds")
+  DataInPath_STG<-paste0(Migration, "/Data/processedLocs/probGLS/RLKI_GLS_201617_forAMNWR_2018-10-30.rda")
 }
 
 
 # OutDataPath<-paste0("//NAS1/Public/all_tracks_11-17_vars_",bufferM/1000,"km_25.rds")
 # load tracks file
 # tracks<-readRDS(paste0(Migration,"/Data/processedLocs/probGLS/RLKI_GLS_alltracks.rda"))
-tracks<-readRDS(DataInPath)
-unique(tracks$loggerID)
+tracks<-readRDS(DataInPath) %>% bind_rows(readRDS(DataInPath_STG))
 #
 # # make date col
 tracks$date<-as.Date(tracks$datetime)
@@ -729,10 +729,12 @@ ggplot()+
 # Highest resolution or the 0.25 degree res?
 aleu <- marmap::getNOAA.bathy(130, -140, 30, 75, resolution = 1,
                               antimeridian = T,keep = T) #resolution 1.85km*27=49.9km2
+
+# aleu <-raster('marmap_coord_-140;30;130;75_res_1_anti.csv')
 # Make it a raster
 bathy<-as.raster(aleu)
 bathy[bathy>=0]<-NA
-
+plot(aleu)
 # get the 200m isobath
 Shelf<-rasterToContour(bathy,level=-200)
 
@@ -774,66 +776,66 @@ saveRDS(tracks,OutDataPath)
 #
 tracks<-readRDS(OutDataPath)
 
-# Inside bering sea? ------------------------------------------------------
-# use Bering_sea.shp to calculate if a point is in the Bering sea
-# http://www.marineregions.org/gazetteer.php?p=details&id=4310
-
-tracksTemp<-data.frame(tracks)
-coordinates(tracksTemp)<-cbind(tracksTemp$lon,tracksTemp$lat)
-proj4string(tracksTemp)<-CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-ber<-read_sf(paste0(BS_ENV,"/iho"),layer="iho",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
-proj4string(ber)
-plot(ber)
-InBer<-over(tracksTemp,ber)
-
-tracks$bs<-as.character(InBer$name)
-tracks$bs[is.na(tracks$bs)]<-"N.Pacific"
-
-
-# Longhurst Provinces -----------------------------------------------------
-
-longh<-read_sf(paste0(BS_ENV,"/longhurst_v4_2010"),layer="Longhurst_world_v4_2010",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
-longhT<-over(tracksTemp,longh)
-
-tracks$longhurst<-as.character(longhT$ProvCode)
-
-saveRDS(tracks,OutDataPath)
-
-length(unique(tracks$loggerID))
-table(tracks$loggerID)
-names(tracks)
-
-# IHO Provinces -----------------------------------------------------
-
-IHO<-read_sf(paste0(BS_ENV,"/World_Seas_IHO_v2"),layer="World_Seas_IHO_v2",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
-IHOT<-over(tracksTemp,IHO)
-table(IHOT$NAME)
-tracks$IHO<-as.character(IHOT$NAME)
-
-saveRDS(tracks,OutDataPath)
-
-length(unique(tracks$loggerID))
-table(tracks$loggerID)
-names(tracks)
-
-# MEOW Ecoregions -----------------------------------------------------
-
-MEOW<-read_sf(paste0(BS_ENV,"/MEOW-TNC"),layer="meow_ecos",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
-plot(IHO)
-MEOWT<-over(tracksTemp,MEOW)
-table(MEOWT$Lat_Zone  )
-tracks$MEOWeco<-as.character(MEOWT$ECOREGION)
-
-ggplot()+
-  geom_point(data=tracks,aes(x=lon360,y=lat,col=MEOWeco),alpha=1,shape=16,size=1)+
-  # coord_fixed(xlim=c(-1000,3500),ylim=c(-1400,3100))+
-  # scale_color_manual(values = c("#F8DF4F","#1C366B","#C4CFD0","#1DACE8","#F24D29","#E5C4A1"))+
-  # geom_polygon(data = w2,aes(x=long,y=lat,group=group),fill="grey")+
-  labs(col="")+theme(legend.position = "top")
-
-
-saveRDS(tracks,OutDataPath)
-
-length(unique(tracks$loggerID))
-table(tracks$loggerID)
-names(tracks)
+# # Inside bering sea? ------------------------------------------------------
+# # use Bering_sea.shp to calculate if a point is in the Bering sea
+# # http://www.marineregions.org/gazetteer.php?p=details&id=4310
+#
+# tracksTemp<-data.frame(tracks)
+# coordinates(tracksTemp)<-cbind(tracksTemp$lon,tracksTemp$lat)
+# proj4string(tracksTemp)<-CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+# ber<-read_sf(paste0(BS_ENV,"/iho"),layer="iho",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
+# proj4string(ber)
+# plot(ber)
+# InBer<-over(tracksTemp,ber)
+#
+# tracks$bs<-as.character(InBer$name)
+# tracks$bs[is.na(tracks$bs)]<-"N.Pacific"
+#
+#
+# # Longhurst Provinces -----------------------------------------------------
+#
+# longh<-read_sf(paste0(BS_ENV,"/longhurst_v4_2010"),layer="Longhurst_world_v4_2010",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
+# longhT<-over(tracksTemp,longh)
+#
+# tracks$longhurst<-as.character(longhT$ProvCode)
+#
+# saveRDS(tracks,OutDataPath)
+#
+# length(unique(tracks$loggerID))
+# table(tracks$loggerID)
+# names(tracks)
+#
+# # IHO Provinces -----------------------------------------------------
+#
+# IHO<-read_sf(paste0(BS_ENV,"/World_Seas_IHO_v2"),layer="World_Seas_IHO_v2",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
+# IHOT<-over(tracksTemp,IHO)
+# table(IHOT$NAME)
+# tracks$IHO<-as.character(IHOT$NAME)
+#
+# saveRDS(tracks,OutDataPath)
+#
+# length(unique(tracks$loggerID))
+# table(tracks$loggerID)
+# names(tracks)
+#
+# # MEOW Ecoregions -----------------------------------------------------
+#
+# MEOW<-read_sf(paste0(BS_ENV,"/MEOW-TNC"),layer="meow_ecos",crs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") %>% as("Spatial")
+# plot(IHO)
+# MEOWT<-over(tracksTemp,MEOW)
+# table(MEOWT$Lat_Zone  )
+# tracks$MEOWeco<-as.character(MEOWT$ECOREGION)
+#
+# ggplot()+
+#   geom_point(data=tracks,aes(x=lon360,y=lat,col=MEOWeco),alpha=1,shape=16,size=1)+
+#   # coord_fixed(xlim=c(-1000,3500),ylim=c(-1400,3100))+
+#   # scale_color_manual(values = c("#F8DF4F","#1C366B","#C4CFD0","#1DACE8","#F24D29","#E5C4A1"))+
+#   # geom_polygon(data = w2,aes(x=long,y=lat,group=group),fill="grey")+
+#   labs(col="")+theme(legend.position = "top")
+#
+#
+# saveRDS(tracks,OutDataPath)
+#
+# length(unique(tracks$loggerID))
+# table(tracks$loggerID)
+# names(tracks)
